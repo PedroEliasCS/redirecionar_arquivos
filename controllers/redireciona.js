@@ -62,20 +62,22 @@ const anoProcessadoF = () => { // faz o processamento do ano atual
 
 anoProcessadoF()
 
-const logErr = (e) => {
+const logErr = (e) => { 
+    // melhorar essa função para criar
+    // um txt de log
+    
     console.log(e)
     return
 }
 
-const random = () => Math.floor(Math.random() * 10 + 1)
-
+const random = () => Math.floor(Math.random() * 10 + 1) // numero randomico
 const copia = async (dir) => { // copia o arquivo
     try {
 
-        let destino = '../destino'
+        let destino = '/Users/peedr/Desktop/destino'
         // isso aqui tem de vir do usuario
 
-
+        // console.log(destino)
         let ext = dir.split('.').pop() // separa a extenção
         let nomeArq = dir.split('/').pop() // separa somente o nome do arquivo
         let nomeDestino = (nomeArq.split('.')) + (Date.now() * random()) // cria um nome do arquivo
@@ -83,6 +85,8 @@ const copia = async (dir) => { // copia o arquivo
         fs.copyFile(dir, `${destino}/${nomeDestino}.${ext}`, "utf8", (err) => {
             if (err) {
                 logErr(err)
+            }else{
+              //  console.log('copiado')
             }
         })
 
@@ -92,17 +96,18 @@ const copia = async (dir) => { // copia o arquivo
     }
 }
 
-const mesIndexOf = (ano, dir) => {
+const mesIndexOf = (ano, dir) => { // faz a divisão dos meses
     if((dir.indexOf(`/${ano}/`)) != '-1' || dir.indexOf(`/${ano-1}/12/`) != '-1'){
-        return true
+        return true // se passar no filtro
     }
 }
 
-const filtros = async (dir) => {
+const filtros = async (dir) => { // faz a filtragem da informação
     let ano = (new Date()).getFullYear() 
-    if(dir.indexOf('/Folha') != '-1' || dir.indexOf('/FOLHA')){
-        if(mesIndexOf(ano, dir) === true) {
-            copia(dir)
+    if(dir.indexOf('/Folha') != '-1' || dir.indexOf('/FOLHA') != '-1'){ // procura informações de nome Folha
+        if(mesIndexOf(ano, dir) === true) {// se o mes e o ano contem na SRC
+           // console.log(dir)
+            copia(dir)// chama a function que copia
         }
     } 
 }
@@ -149,11 +154,11 @@ const readdir = async (dir) => { // lista os nomes dos arquivos das pasta
 
 
 controller.redireciona = async () => { // controler que fara uma bela bagunça 
-    deleteDest('../destino/on')
+    deleteDest('../destino/') // apaga arquivos
     setTimeout(() => {
 
         readdir('../Arquivos') // faz a varedura e copia dos arquivos
-    }, 1000);
+    }, 5000);
 
 
 
