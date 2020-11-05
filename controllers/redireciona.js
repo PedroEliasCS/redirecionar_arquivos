@@ -71,6 +71,10 @@ const logErr = (e) => {
 }
 
 const random = () => Math.floor(Math.random() * 10 + 1) // numero randomico
+
+
+let cont = 0
+
 const copia = async (dir) => { // copia o arquivo
     try {
 
@@ -79,6 +83,7 @@ const copia = async (dir) => { // copia o arquivo
 
         // console.log(destino)
         let ext = dir.split('.').pop() // separa a extenção
+        if(ext != 'pdf') return
         let nomeArq = dir.split('/').pop() // separa somente o nome do arquivo
         let nomeDestino = (nomeArq.split('.')) + (Date.now() * random()) // cria um nome do arquivo
       //  console.log(dir)
@@ -86,7 +91,8 @@ const copia = async (dir) => { // copia o arquivo
             if (err) {
                 logErr(err)
             }else{
-              //  console.log('copiado')
+                console.log(cont)
+                cont++
             }
         })
 
@@ -133,7 +139,6 @@ const stat = async (dir) => { // um unico arquivo chega nesse passo
     }
 }
 
-let cont = 0
 const readdir = async (dir) => { // lista os nomes dos arquivos das pasta 
     try {
         await fs.readdir(dir, (err, path) => { // lista os nomes dos arquivos da pasta
