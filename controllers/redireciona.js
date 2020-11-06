@@ -20,11 +20,37 @@ controller.ultimoDia = async (req, res) => {
 const deleteDest = async (dir) => { // deleta 
     try {
 
-        fs.readdir(dir, (err, path) => { // lista todos os nome dos arquivos
-            for (let prop in path) { // passa dentro da lista arquivo por arquivo
-                fs.unlink(dir + path[prop], (err) => { // deleta arquivo por arquivo
-                    if (err) console.log(err) // caso algo de errado
+        fs.readdir(dir, (err, list) => { // lista todos os nome dos arquivos
+            if (err) {
+                logErr(e)
+                return
+            }
+            for (let prop in list) { // passa dentro da lista arquivo por arquivo
+                fs.stat(dir + list[prop], (err, file) => { // abri descrição do arquivo
+                    if (err) { // caso algo de errado
+                        logErr(err)
+                        return
+                    } else { // caso de certo
+                        try {
+                            if (file.isDirectory() == true) { // apaga as pastas do diretorio e cria vazias
+                                fs.rmdirSync(dir + list[prop], { // apaga as pastas carregadas
+                                    recursive: true
+                                });
+                                fs.mkdirSync(dir + list[prop]); // cria as pastas
+                            } else if (file.isFile() == true) { // se algum arquivo for criado 
+                                logErr('não deveria ter arquivos aqui') // reportar
+                                fs.unlink(dir + list[prop]) // deletar o arquivo
+                            }
+                        } catch (e) {
+                            logErr(e)
+                        }
+                    }
                 })
+
+
+                // fs.unlink(dir + path[prop], (err) => { // deleta arquivo por arquivo
+                //     if (err) console.log(err) // caso algo de errado
+                // })
             }
         })
     } catch (e) {
@@ -33,34 +59,35 @@ const deleteDest = async (dir) => { // deleta
     }
 }
 
-const anoProcessadoF = () => { // faz o processamento do ano atual
+const anoProcessadoF = (dir) => { // faz o processamento do ano atual
     fs.readFile('./ultimoDia.json', 'utf8', (err, data) => { // faz a leitura do json
         if (err) { // caso algo da errado
             console.log(err)
         } else { // caso de certo
             let json = JSON.parse(data) // converta o data Json para JSON 
-            let anoProcessado = json.data // acha a data atual
-            anoProcessado = (new Date(anoProcessado)).getFullYear() // separa o ano processado
-            //console.log(anoProcessado)
+            // let diaprocessado = json.data // acha a data atual
+            // diaprocessado = (new Date(diaprocessado)) // separa o ano processado
+            // console.log(diaprocessado)
             let dataAtual = new Date() // data atual
-            let anoAtual = dataAtual.getFullYear() // só o ano atual 
-            if (anoProcessado != anoAtual) { // se anos diferirem
-                json.data = dataAtual // troca a data atual do json 
-                json = JSON.stringify(json) // converte em json a data atual
-                fs.writeFile('./ultimoDia.json', json, 'utf8', (err) => { //  sobreescreve arquivo json
-                    if (err) { // caso algo de errado
-                        logErr(err) // chama o log erro
-                        return
-                    } else { // deu certo?
-                        deleteDest('../destino/') // chama a function que deleta 
-                    }
-                })
-            } // else {} caso  o ano seja igual não fazer nada
+            //let anoAtual = dataAtual.getFullYear() // só o ano atual 
+            //if (diaprocessado < dataAtual) { // se anos diferirem
+            json.data = dataAtual // troca a data atual do json 
+            json = JSON.stringify(json) // converte em json a data atual
+            fs.writeFile('./ultimoDia.json', json, 'utf8', (err) => { //  sobreescreve arquivo json
+                if (err) { // caso algo de errado
+                    logErr(err) // chama o log erro
+                    return
+                } else { // deu certo?
+                    console.log('data atualizada')
+                    deleteDest(dir) // chama a function que deleta 
+                }
+            })
+            // } // else {} caso  o ano seja igual não fazer nada
         }
     })
 }
 
-anoProcessadoF()
+
 
 const logErr = (e) => {
     // melhorar essa função para criar
@@ -75,10 +102,10 @@ const random = () => Math.floor(Math.random() * 10 + 1) // numero randomico
 
 let cont = 0
 
-const copia = async (dir) => { // copia o arquivo
+const copia = async (dir, destino) => { // copia o arquivo
     try {
 
-        let destino = '/Users/peedr/Desktop/destino'
+        // destino
         // isso aqui tem de vir do usuario
 
         // console.log(destino)
@@ -110,10 +137,12 @@ const mesIndexOf = (ano, dir) => { // faz a divisão dos meses
 
 const filtros = async (dir) => { // faz a filtragem da informação
     let ano = (new Date()).getFullYear()
+    // checa se informação é do DP
     if (dir.indexOf('/Folha') != '-1' || dir.indexOf('/FOLHA') != '-1') { // procura informações de nome Folha
         if (mesIndexOf(ano, dir) === true) { // se o mes e o ano contem na SRC
             // console.log(dir)
-            copia(dir) // chama a function que copia
+            // 
+            copia(dir, '/Users/peedr/Desktop/destino/dp') // chama a function que copia
         }
     }
 }
@@ -158,10 +187,11 @@ const readdir = async (dir) => { // lista os nomes dos arquivos das pasta
 
 
 controller.redireciona = async () => { // controler que fara uma bela bagunça 
-    deleteDest('../destino/') // apaga arquivos
+    console.log('33')
+    anoProcessadoF('../destino/') // apaga arquivos
     setTimeout(() => {
 
-        readdir('../Arquivos') // faz a varedura e copia dos arquivos
+        //        readdir('../Arquivos') // faz a varedura e copia dos arquivos
     }, 5000);
 
 
