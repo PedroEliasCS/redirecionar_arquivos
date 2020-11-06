@@ -29,7 +29,7 @@ setInterval(async () => {
     let horas = (hoje.getHours())
     let minutos = (hoje.getMinutes())
     if(minutos == 48 || minutos == 49 ){
-        if(horas == 14){
+        if(horas == 3){
             redireciona.redireciona()
         }
     }

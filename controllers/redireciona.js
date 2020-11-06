@@ -1,5 +1,5 @@
 let controller = {}
-
+let cont = 0
 const fs = require('fs')
 
 
@@ -11,7 +11,7 @@ controller.ultimoDia = async (req, res) => {
             res.status(500).send('pedro')
         } else {
             let a = JSON.parse(data)
-            res.status(200).send(a.data)
+            res.status(200).send(a.data + '<br> arquivos processados : ' + cont)
         }
     })
 }
@@ -19,14 +19,14 @@ controller.ultimoDia = async (req, res) => {
 
 const deleteDest = async (dir) => { // deleta 
     try {
-
-        fs.readdir(dir, (err, list) => { // lista todos os nome dos arquivos
+        let pastas = ['dp', 'fiscal', 'contabil']
+        fs.readdir(dir, async (err, list) => { // lista todos os nome dos arquivos
             if (err) {
                 logErr(e)
                 return
             }
             for (let prop in list) { // passa dentro da lista arquivo por arquivo
-                fs.stat(dir + list[prop], (err, file) => { // abri descrição do arquivo
+                fs.stat(dir + list[prop], async (err, file) => { // abri descrição do arquivo
                     if (err) { // caso algo de errado
                         logErr(err)
                         return
@@ -36,22 +36,24 @@ const deleteDest = async (dir) => { // deleta
                                 fs.rmdirSync(dir + list[prop], { // apaga as pastas carregadas
                                     recursive: true
                                 });
-                                fs.mkdirSync(dir + list[prop]); // cria as pastas
+
                             } else if (file.isFile() == true) { // se algum arquivo for criado 
                                 logErr('não deveria ter arquivos aqui') // reportar
-                                fs.unlink(dir + list[prop]) // deletar o arquivo
+                                fs.unlink(dir + list[prop], (err) => {
+                                    if(err) logErr(err)
+                                }) // deletar o arquivo
                             }
                         } catch (e) {
                             logErr(e)
                         }
                     }
                 })
-
-
-                // fs.unlink(dir + path[prop], (err) => { // deleta arquivo por arquivo
-                //     if (err) console.log(err) // caso algo de errado
-                // })
             }
+            setTimeout(() => {
+                for(let prop in pastas){
+                    fs.mkdirSync(dir + pastas[prop]);
+                }
+            }, 2000);
         })
     } catch (e) {
         logErr(e)
@@ -97,10 +99,10 @@ const logErr = (e) => {
     return
 }
 
-const random = () => Math.floor(Math.random() * 10 + 1) // numero randomico
+const random = () => Math.floor(Math.random() * 100 + 1) // numero randomico
 
 
-let cont = 0
+
 
 const copia = async (dir, destino) => { // copia o arquivo
     try {
@@ -118,7 +120,7 @@ const copia = async (dir, destino) => { // copia o arquivo
             if (err) {
                 logErr(err)
             } else {
-                console.log(cont)
+                // console.log(cont)
                 cont++
             }
         })
@@ -138,11 +140,16 @@ const mesIndexOf = (ano, dir) => { // faz a divisão dos meses
 const filtros = async (dir) => { // faz a filtragem da informação
     let ano = (new Date()).getFullYear()
     // checa se informação é do DP
-    if (dir.indexOf('/Folha') != '-1' || dir.indexOf('/FOLHA') != '-1') { // procura informações de nome Folha
-        if (mesIndexOf(ano, dir) === true) { // se o mes e o ano contem na SRC
-            // console.log(dir)
-            // 
-            copia(dir, '/Users/peedr/Desktop/destino/dp') // chama a function que copia
+
+    if (mesIndexOf(ano, dir) === true) {
+        // grupo DP
+        if (dir.indexOf('/Folha') != '-1' || dir.indexOf('/FOLHA') != '-1') { // procura informações de nome Folha
+            // se o mes e o ano contem na SRC 
+             copia(dir, '/Users/peedr/Desktop/destino/dp') // chama a function que copia
+        };
+        // grupo fiscal
+        if (dir.indexOf('/G5') != '-1' || dir.indexOf('/g5') != '-1'){
+            copia(dir, '/Users/peedr/Desktop/destino/fiscal')
         }
     }
 }
@@ -187,12 +194,12 @@ const readdir = async (dir) => { // lista os nomes dos arquivos das pasta
 
 
 controller.redireciona = async () => { // controler que fara uma bela bagunça 
-    console.log('33')
+    //    console.log('33')
     anoProcessadoF('../destino/') // apaga arquivos
     setTimeout(() => {
 
-        //        readdir('../Arquivos') // faz a varedura e copia dos arquivos
-    }, 5000);
+        readdir('../Arquivos') // faz a varedura e copia dos arquivos
+    }, 10000);
 
 
 
