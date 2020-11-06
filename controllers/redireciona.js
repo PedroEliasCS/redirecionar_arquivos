@@ -62,10 +62,10 @@ const anoProcessadoF = () => { // faz o processamento do ano atual
 
 anoProcessadoF()
 
-const logErr = (e) => { 
+const logErr = (e) => {
     // melhorar essa função para criar
     // um txt de log
-    
+
     console.log(e)
     return
 }
@@ -83,14 +83,14 @@ const copia = async (dir) => { // copia o arquivo
 
         // console.log(destino)
         let ext = dir.split('.').pop() // separa a extenção
-        if(ext != 'pdf') return
+        if (ext != 'pdf') return
         let nomeArq = dir.split('/').pop() // separa somente o nome do arquivo
         let nomeDestino = (nomeArq.split('.')) + (Date.now() * random()) // cria um nome do arquivo
-      //  console.log(dir)
+        //  console.log(dir)
         fs.copyFile(dir, `${destino}/${nomeDestino}.${ext}`, "utf8", (err) => {
             if (err) {
                 logErr(err)
-            }else{
+            } else {
                 console.log(cont)
                 cont++
             }
@@ -103,20 +103,21 @@ const copia = async (dir) => { // copia o arquivo
 }
 
 const mesIndexOf = (ano, dir) => { // faz a divisão dos meses
-    if((dir.indexOf(`/${ano}/`)) != '-1' || dir.indexOf(`/${ano-1}/12/`) != '-1'){
+    if ((dir.indexOf(`/${ano}/`)) != '-1' || dir.indexOf(`/${ano-1}/12/`) != '-1') {
         return true // se passar no filtro
     }
 }
 
 const filtros = async (dir) => { // faz a filtragem da informação
-    let ano = (new Date()).getFullYear() 
-    if(dir.indexOf('/Folha') != '-1' || dir.indexOf('/FOLHA') != '-1'){ // procura informações de nome Folha
-        if(mesIndexOf(ano, dir) === true) {// se o mes e o ano contem na SRC
-           // console.log(dir)
-            copia(dir)// chama a function que copia
+    let ano = (new Date()).getFullYear()
+    if (dir.indexOf('/Folha') != '-1' || dir.indexOf('/FOLHA') != '-1') { // procura informações de nome Folha
+        if (mesIndexOf(ano, dir) === true) { // se o mes e o ano contem na SRC
+            // console.log(dir)
+            copia(dir) // chama a function que copia
         }
-    } 
+    }
 }
+
 const stat = async (dir) => { // um unico arquivo chega nesse passo 
     try {
 
@@ -154,8 +155,6 @@ const readdir = async (dir) => { // lista os nomes dos arquivos das pasta
         return
     }
 }
-
-
 
 
 controller.redireciona = async () => { // controler que fara uma bela bagunça 
